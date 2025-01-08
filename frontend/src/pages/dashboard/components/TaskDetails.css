@@ -1,6 +1,6 @@
 @media (max-width: 1024px) {
     .custom-width {
-      width: calc(100vw - 11rem);
+      width: calc(100vw - 10rem);
     }
   }
 @media (max-width: 645px) {
@@ -12,6 +12,12 @@
 @media (max-width: 525px) {
     .custom-width {
       width: calc(100vw - 3rem);
+    }
+  }
+
+  @media (min-width: 1025px) {
+    .custom-width {
+      width: calc(100vw - 30rem);
     }
   }
   
