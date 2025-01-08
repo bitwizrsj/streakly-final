@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Menu, Sun, Moon, Github } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
-import { useTheme } from '../../../context/ThemeContext';
+import { useTheme } from '../../../context/ThemeContext'; 
 import Modal from '../../../components/UI/Modal';
 import LoginForm from '../../../components/Auth/LoginForm';
 import SignupForm from '../../../components/Auth/SignupForm';
@@ -18,7 +18,7 @@ const Navbar: React.FC = () => {
 
   return (
     <>
-      <nav className="bg-white shadow-sm dark:bg-gray-800">
+      <nav className="bg-green-400 shadow-sm dark:bg-green-400">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
@@ -48,20 +48,24 @@ const Navbar: React.FC = () => {
               )}
             </div>
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Menu or Profile */}
             <div className="sm:hidden flex items-center">
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"
-              >
-                <Menu className="h-6 w-6" />
-              </button>
+              {user ? (
+                <ProfileDropdown email={user.email} onLogout={logout} />
+              ) : (
+                <button
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                  className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  <Menu className="h-6 w-6" />
+                </button>
+              )}
             </div>
           </div>
         </div>
 
         {/* Mobile Menu */}
-        {isMobileMenuOpen && (
+        {isMobileMenuOpen && !user && (
           <div className="sm:hidden bg-white dark:bg-gray-800 pb-4">
             <div className="px-4 space-y-3">
               <button
@@ -71,24 +75,7 @@ const Navbar: React.FC = () => {
                 {isDark ? 'Light Mode' : 'Dark Mode'}
               </button>
               
-              {user ? (
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2 p-2">
-                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
-                      <span className="text-white text-sm font-medium">
-                        {user.email.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                    <span className="text-gray-700 dark:text-gray-200">{user.email}</span>
-                  </div>
-                  <button
-                    onClick={logout}
-                    className="w-full flex items-center px-4 py-2 text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
-                  >
-                    Logout
-                  </button>
-                </div>
-              ) : (
+              {!user ? (
                 <>
                   <button
                     onClick={() => setIsLoginOpen(true)}
@@ -103,7 +90,7 @@ const Navbar: React.FC = () => {
                     Sign up
                   </button>
                 </>
-              )}
+              ) : null}
             </div>
           </div>
         )}

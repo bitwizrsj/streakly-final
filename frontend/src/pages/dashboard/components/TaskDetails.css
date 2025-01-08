@@ -1,0 +1,17 @@
+@media (max-width: 1024px) {
+    .custom-width {
+      width: calc(100vw - 11rem);
+    }
+  }
+@media (max-width: 645px) {
+    .custom-width {
+      width: calc(100vw - 6rem);
+    }
+  }
+  
+@media (max-width: 525px) {
+    .custom-width {
+      width: calc(100vw - 3rem);
+    }
+  }
+  

@@ -13,7 +13,7 @@ const TaskSidebar = () => {
   return (
     <>
       {/* Sidebar for larger screens */}
-      <aside className="lg:w-64 w-full bg-white dark:bg-gray-800 shadow-sm h-[calc(100vh-4rem)] fixed lg:block hidden overflow-y-auto">
+      <aside className="lg:w-64 w-full bg-gray-100 dark:text-white dark:bg-gray-800 shadow-sm h-screen  lg:block hidden overflow-y-auto">
         <nav className="p-4 space-y-6">
           {/* Main navigation */}
           <div className="space-y-2">

@@ -1,84 +1,90 @@
 import React from 'react';
-import { format, eachDayOfInterval, subMonths, getMonth } from 'date-fns';
+import { format, subMonths, eachDayOfInterval, startOfWeek, endOfWeek } from 'date-fns';
 
 interface ContributionCalendarProps {
   completions: string[];
 }
 
 const ContributionCalendar: React.FC<ContributionCalendarProps> = ({ completions }) => {
-  const endDate = new Date();
-  const startDate = subMonths(endDate, 12);
-  const dates = eachDayOfInterval({ start: startDate, end: endDate });
+  const endDate = new Date(); // Current date
+  const startDate = subMonths(endDate, 12); // One year ago from the current date
 
-  // Group dates by month
-  const monthlyData = dates.reduce((acc, date) => {
-    const monthKey = format(date, 'MMM');
-    if (!acc[monthKey]) {
-      acc[monthKey] = [];
-    }
-    acc[monthKey].push(date);
-    return acc;
-  }, {} as Record<string, Date[]>);
+  // Generate all dates within the interval, extending to full weeks for proper alignment
+  const allDates = eachDayOfInterval({
+    start: startOfWeek(startDate, { weekStartsOn: 0 }),
+    end: endOfWeek(endDate, { weekStartsOn: 0 }),
+  });
 
-  const getContributionLevel = (date: Date): number => {
+  // Split dates into weeks for display in rows
+  const weeks: Date[][] = [];
+  for (let i = 0; i < allDates.length; i += 7) {
+    weeks.push(allDates.slice(i, i + 7));
+  }
+
+  // Check if a date has a completed task
+  const getContributionLevel = (date: Date): boolean => {
     const dateStr = date.toISOString().split('T')[0];
-    if (!completions.includes(dateStr)) return 0;
-    return 4; // Maximum intensity for completed days
+    return completions.includes(dateStr);
   };
 
-  const getContributionColor = (level: number): string => {
-    const colors = [
-      'bg-gray-100',
-      'bg-green-100',
-      'bg-green-300',
-      'bg-green-500',
-      'bg-green-700'
-    ];
-    return colors[level];
+  // Determine the color of a box based on whether it's completed
+  const getContributionColor = (isCompleted: boolean): string => {
+    return isCompleted ? 'bg-green-500' : 'bg-gray-100'; // Green for completed, gray for not completed
+  };
+
+  // Helper function to display the month name only once per column
+  const getMonthName = (week: Date[], columnIndex: number): string | null => {
+    const firstDayOfWeek = week[0];
+    const isStartOfMonth = firstDayOfWeek.getDate() === 1;
+    const isFirstColumn = columnIndex === 0;
+
+    // Show the month name only if it's the first column or start of a new month
+    return isStartOfMonth || isFirstColumn ? format(firstDayOfWeek, 'MMM') : null;
   };
 
   return (
-    <div className="w-full overflow-x-auto">
+    <div className="h-60 overflow-x-auto dark:bg-gray-700 dark:text-white">
       <div className="inline-block min-w-full">
-        {/* Month labels */}
+        {/* Month Names */}
         <div className="flex text-xs text-gray-500 mb-2">
-          <div className="w-8" /> {/* Spacer for day labels */}
-          {Object.keys(monthlyData).map((month) => (
-            <div key={month} className="flex-1 text-center">
-              {month}
-            </div>
-          ))}
+          {weeks[0].map((date, columnIndex) => {
+            const isStartOfMonth = date.getDate() === 1; // Check if this is the first day of a month
+            return (
+              <div key={columnIndex} className="w-6 h-6 text-center">
+                {isStartOfMonth ? format(date, 'MMM') : ''}
+              </div>
+            );
+          })}
         </div>
 
-        {/* Calendar grid */}
-        <div className="flex">
-          {/* Day labels */}
-          <div className="flex flex-col text-xs text-gray-500 mr-2 space-y-2">
-            <span>Mon</span>
-            <span>Wed</span>
-            <span>Fri</span>
+        {/* Calendar Grid */}
+        <div className="flex w-full space-x-2">
+          {/* Day Labels */}
+          <div className="flex flex-col text-xs text-gray-500 mr-2 space-y-1">
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+              <span key={day}>{day}</span>
+            ))}
           </div>
 
-          {/* Contribution squares */}
-          <div className="flex flex-1">
-            {Object.values(monthlyData).map((days, monthIndex) => (
-              <div key={monthIndex} className="flex-1 flex gap-1">
-                {Array.from({ length: 7 }).map((_, dayOfWeek) => (
-                  <div key={dayOfWeek} className="flex flex-col gap-1">
-                    {days
-                      .filter((date) => date.getDay() === dayOfWeek)
-                      .map((date) => {
-                        const level = getContributionLevel(date);
-                        return (
-                          <div
-                            key={date.toISOString()}
-                            className={`w-3 h-3 rounded-sm ${getContributionColor(level)}`}
-                            title={`${format(date, 'PP')}: ${level ? 'Completed' : 'No activity'}`}
-                          />
-                        );
-                      })}
-                  </div>
-                ))}
+          {/* Contribution Squares */}
+          <div className="flex flex-1 gap-1 overflow-x-auto">
+            {weeks.map((week, weekIndex) => (
+              <div key={weekIndex} className="flex flex-col gap-1">
+                {week.map((date) => {
+                  if (date > endDate) return null; // Skip future dates
+                  const isCompleted = getContributionLevel(date);
+                  return (
+                    <div
+                      key={date.toISOString()}
+                      className={`w-4 h-4 rounded-sm ${getContributionColor(
+                        isCompleted
+                      )} border`}
+                      title={`${format(date, 'PP')}: ${
+                        isCompleted ? 'Completed' : 'No activity'
+                      }`}
+                    />
+                  );
+                })}
               </div>
             ))}
           </div>
@@ -88,12 +94,8 @@ const ContributionCalendar: React.FC<ContributionCalendarProps> = ({ completions
         <div className="flex items-center justify-end mt-4 text-xs text-gray-500">
           <span>Less</span>
           <div className="flex gap-1 mx-2">
-            {[0, 1, 2, 3, 4].map((level) => (
-              <div
-                key={level}
-                className={`w-3 h-3 rounded-sm ${getContributionColor(level)}`}
-              />
-            ))}
+            <div className="w-4 h-4 rounded-sm bg-gray-100 border" />
+            <div className="w-4 h-4 rounded-sm bg-green-500 border" />
           </div>
           <span>More</span>
         </div>

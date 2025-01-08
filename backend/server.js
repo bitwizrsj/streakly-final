@@ -26,6 +26,7 @@ mongoose.connect(process.env.MONGO)
 // Routes
 app.use("/api/auth", authRoutes);
 
+
 // Fallback route for undefined endpoints
 app.use((req, res) => {
   res.status(404).json({ message: "Endpoint not found" });

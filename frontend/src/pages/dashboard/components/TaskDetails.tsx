@@ -2,6 +2,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useTaskContext } from '../../../context/TaskContext';
 import ContributionCalendar from './ContributionCalendar';
+import './TaskDetails.css';
 
 const TaskDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -39,28 +40,30 @@ const TaskDetails: React.FC = () => {
   const { currentStreak, longestStreak } = calculateStreak();
 
   return (
-    <div className="space-y-8">
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-2xl font-bold mb-6">{task.name}</h2>
-        <div className="grid grid-cols-3 gap-4">
-          <div className="bg-gray-50 p-4 rounded-lg">
+    <div className="space-y-8 sm:px-6 lg:px-8 ">
+      <div className="bg-white rounded-lg p-6 dark:bg-gray-700 ">
+        <h2 className="text-2xl font-bold mb-6 dark:text-white">{task.name}</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="bg-green-200 p-4 rounded-lg">
             <h3 className="text-lg font-medium mb-2">Total Completions</h3>
             <p className="text-3xl font-bold">{task.completions.length}</p>
           </div>
-          <div className="bg-gray-50 p-4 rounded-lg">
+          <div className="bg-yellow-100 p-4 rounded-lg">
             <h3 className="text-lg font-medium mb-2">Current Streak</h3>
             <p className="text-3xl font-bold">{currentStreak} days</p>
           </div>
-          <div className="bg-gray-50 p-4 rounded-lg">
+          <div className="bg-blue-200 p-4 rounded-lg">
             <h3 className="text-lg font-medium mb-2">Longest Streak</h3>
             <p className="text-3xl font-bold">{longestStreak} days</p>
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white rounded-lg w-full shadow p-6 dark:bg-gray-700 dark:text-white">
         <h3 className="text-lg font-medium mb-4">Activity Calendar</h3>
-        <ContributionCalendar completions={task.completions} />
+        <div className="overflow-x-auto  w-[calc(100vw-30rem)] custom-width max-w-[70rem] ">
+          <ContributionCalendar completions={task.completions} />
+        </div>
       </div>
     </div>
   );

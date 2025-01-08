@@ -49,40 +49,9 @@ const TaskForm: React.FC = () => {
           />
         </div>
         <div>
-          <label htmlFor="interval" className="block text-sm font-medium text-gray-700">
-            Time Interval (Days)
-          </label>
-          <select
-            id="interval"
-            value={interval}
-            onChange={handleIntervalChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            required
-          >
-            <option value="1 day">1 Day</option>
-            <option value="1 week">1 Week</option>
-            <option value="2 weeks">2 Weeks</option>
-            <option value="1 month">1 Month</option>
-            <option value="2 months">2 Months</option>
-            <option value="3 months">3 Months</option>
-            <option value="Custom">Custom</option>
-          </select>
-        </div>
-        {interval === 'Custom' && (
-          <div>
-            <label htmlFor="custom-interval" className="block text-sm font-medium text-gray-700">
-              Custom Interval
-            </label>
-            <input
-              type="text"
-              id="custom-interval"
-              value={customInterval}
-              onChange={(e) => setCustomInterval(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              placeholder="e.g., 5 days, 3 weeks"
-            />
+          
           </div>
-        )}
+        
         <button
           type="submit"
           className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
