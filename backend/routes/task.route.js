@@ -1,66 +1,21 @@
-const express = require('express');
-const { Task, User } = require('../models');
-
+import express from 'express';  // Use ES module import syntax
 const router = express.Router();
+import { createTask, getTasks, getTask, deleteTask, toggleCompletion } from '../controller/task.controller.js';  // Importing functions
+import  authenticate  from '../middleware/auth.middleware.js';  // Assuming you have an auth middleware
 
-// Create a new task
-router.post('/', async (req, res) => {
-    try {
-        const { username, name, interval } = req.body;
-        const user = await User.findOne({ username });
-        if (!user) return res.status(404).send('User not found');
+// Create a task
+router.post('/tasks', authenticate, createTask);
 
-        const task = new Task({ name, interval });
-        await task.save();
-        user.tasks.push(task._id);
-        await user.save();
+// Get all tasks for the authenticated user
+router.get('/tasks', authenticate, getTasks);
 
-        res.status(201).send(task);
-    } catch (err) {
-        res.status(500).send(err.message);
-    }
-});
-
-// Get a task
-router.get('/:taskId', async (req, res) => {
-    try {
-        const task = await Task.findById(req.params.taskId);
-        if (!task) return res.status(404).send('Task not found');
-        res.send(task);
-    } catch (err) {
-        res.status(500).send(err.message);
-    }
-});
-
-// Update task (toggle completion)
-router.put('/:taskId', async (req, res) => {
-    try {
-        const { date } = req.body; // Expects ISO date
-        const task = await Task.findById(req.params.taskId);
-        if (!task) return res.status(404).send('Task not found');
-
-        const index = task.completions.indexOf(date);
-        if (index > -1) {
-            task.completions.splice(index, 1); // Remove completion
-        } else {
-            task.completions.push(date); // Add completion
-        }
-        await task.save();
-        res.send(task);
-    } catch (err) {
-        res.status(500).send(err.message);
-    }
-});
+// Get a specific task by ID
+router.get('/tasks/:id', authenticate, getTask);
 
 // Delete a task
-router.delete('/:taskId', async (req, res) => {
-    try {
-        const task = await Task.findByIdAndDelete(req.params.taskId);
-        if (!task) return res.status(404).send('Task not found');
-        res.send(task);
-    } catch (err) {
-        res.status(500).send(err.message);
-    }
-});
+router.delete('/tasks/:id', authenticate, deleteTask);
 
-module.exports = router;
+// Toggle task completion
+router.post('/tasks/completion', authenticate, toggleCompletion);
+
+export default router;  // Exporting the router using ES module export syntax

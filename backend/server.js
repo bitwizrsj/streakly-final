@@ -1,8 +1,10 @@
+
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
-import authRoutes from "./routes/auth.route.js";
+import authRoutes from "./routes/auth.route.js";  // Auth routes
+import taskRoutes from "./routes/task.route.js";  // Task routes
 
 dotenv.config();
 
@@ -19,13 +21,19 @@ app.use(cors({
 app.use(express.json());
 
 // Database connection
-mongoose.connect(process.env.MONGO)
-  .then(() => console.log("Connected to MongoDB"))
-  .catch(err => console.error("MongoDB connection error:", err));
+(async () => {
+  try {
+    await mongoose.connect(process.env.MONGO);
+    console.log("Connected to MongoDB");
+  } catch (err) {
+    console.error("MongoDB connection error:", err);
+    process.exit(1); // Exit if DB connection fails
+  }
+})();
 
 // Routes
-app.use("/api/auth", authRoutes);
-
+app.use("/api/auth", authRoutes);  // Authentication routes
+app.use("/api/tasks", taskRoutes); // Task routes
 
 // Fallback route for undefined endpoints
 app.use((req, res) => {
